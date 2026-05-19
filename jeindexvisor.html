@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor HTML Jeindex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        #tech-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #020617; /* Navy Dark */
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col overflow-hidden">
+    
+    <!-- Background Canvas -->
+    <canvas id="tech-bg"></canvas>
+
+    <!-- Header Section -->
+    <header class="p-4 flex items-center justify-between border-b border-green-900 bg-slate-950/80 backdrop-blur-sm z-10">
+        <div class="flex items-center gap-4">
+            <a href="https://freeimage.host/"><img src="https://iili.io/Bym6FY7.png" alt="Logo Jeindex" class="h-12 w-12 object-contain" /></a>
+            <h1 class="text-2xl font-bold text-green-400">Visor HTML Jeindex</h1>
+        </div>
+        <div class="flex gap-2 bg-slate-900 p-1 rounded-lg border border-green-800">
+            <button onclick="setPreviewMode('mobile')" class="px-4 py-1.5 rounded-md text-sm font-medium hover:bg-green-900 transition text-green-200">📱 Móvil</button>
+            <button onclick="setPreviewMode('tablet')" class="px-4 py-1.5 rounded-md text-sm font-medium hover:bg-green-900 transition text-green-200">📱 Tablet</button>
+            <button onclick="setPreviewMode('desktop')" class="px-4 py-1.5 rounded-md text-sm font-medium hover:bg-green-900 transition text-green-200">💻 PC</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col gap-4 p-4 overflow-hidden">
+        
+        <!-- Preview Section -->
+        <section class="h-1/2 w-full flex flex-col items-center bg-slate-900/50 rounded-2xl border border-green-800 p-2 shadow-2xl">
+            <div id="previewFrameContainer" class="w-full h-full bg-white rounded-xl overflow-hidden transition-all duration-500 ease-in-out">
+                <iframe id="previewFrame" class="w-full h-full border-0"></iframe>
+            </div>
+        </section>
+
+        <!-- Editor Section -->
+        <section class="h-1/2 w-full flex flex-col gap-2">
+            <label class="text-xs font-bold text-green-500 uppercase tracking-widest pl-2">Editor HTML / CSS</label>
+            <textarea 
+                id="codeEditor" 
+                class="w-full flex-1 p-6 font-mono text-sm bg-black/70 text-green-400 rounded-xl border border-green-900 focus:ring-2 focus:ring-green-500 outline-none resize-none shadow-[0_0_15px_rgba(34,197,94,0.2)]"
+                placeholder="<!-- Escribe aquí tu HTML y CSS aquí -->
+<div class='p-10 bg-slate-800 rounded-lg'>
+  <h1 class='text-green-400 text-3xl font-bold'>¡Hola Jeindex!</h1>
+  <p class='text-white'>Edita este código para ver los cambios.</p>
+</div>"
+            ></textarea>
+        </section>
+    </main>
+
+    <script>
+        // Tech Lines Animation
+        const canvas = document.getElementById('tech-bg');
+        const ctx = canvas.getContext('2d');
+        let width, height, lines;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            lines = [];
+            for (let i = 0; i < 30; i++) {
+                lines.push({ x: Math.random() * width, y: Math.random() * height, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 });
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.1)';
+            ctx.fillRect(0, 0, width, height);
+            ctx.strokeStyle = 'rgba(74, 222, 128, 0.15)';
+            ctx.beginPath();
+            lines.forEach((line, i) => {
+                line.x += line.vx; line.y += line.vy;
+                if (line.x < 0 || line.x > width) line.vx *= -1;
+                if (line.y < 0 || line.y > height) line.vy *= -1;
+                ctx.moveTo(line.x, line.y);
+                ctx.lineTo(lines[(i + 1) % lines.length].x, lines[(i + 1) % lines.length].y);
+            });
+            ctx.stroke();
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        draw();
+
+        // Editor Logic
+        const editor = document.getElementById('codeEditor');
+        const preview = document.getElementById('previewFrame');
+        const container = document.getElementById('previewFrameContainer');
+
+        function updatePreview() {
+            const content = `
+                <html>
+                <head>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                </head>
+                <body class="bg-gray-50">
+                    ${editor.value}
+                </body>
+                </html>
+            `;
+            preview.srcdoc = content;
+        }
+
+        editor.addEventListener('input', updatePreview);
+
+        function setPreviewMode(mode) {
+            const widths = { 'mobile': '375px', 'tablet': '768px', 'desktop': '100%' };
+            container.style.width = widths[mode];
+        }
+
+        updatePreview();
+    </script>
+</body>
+</html>
